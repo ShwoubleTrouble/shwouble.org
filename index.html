@@ -1,12 +1,75 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
- <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>shwouble</title>
- </head>
- <body>
-  <h1>Мне нечего тут сделать, так что наслаждайся этим мега эдитом.</h1>
-  <!-- Комментарий -->
-  <video width="640" height="480" controls src="https://i.imgur.com/4nIdqi8.mp4"></video>
- </body>
+
+
+        @keyframes gradient {
+            0% {background-position: 0% 50%}
+            50% {background-position: 100% 50%}
+            100% {background-position: 0% 50%}
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Shwouble</h1>
+    </div>
+ 
+    <div class="player-container">
+        <video id="videoPlayer" src="video.mp4"></video>
+        <div class="controls">
+            <button class="play-button" id="playPauseButton">▶️</button>
+            <input type="range" class="seek-bar" id="seekBar" value="0">
+            <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+        </div>
+        <div class="message">
+            Мне нечего тут сделать, так что наслаждайся этим мега эдитом.
+        </div>
+    </div>
+
+    <script>
+        const videoPlayer = document.getElementById('videoPlayer');
+        const playPauseButton = document.getElementById('playPauseButton');
+        const seekBar = document.getElementById('seekBar');
+        const timeDisplay = document.getElementById('timeDisplay');
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            seconds = Math.floor(seconds % 60);
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        playPauseButton.addEventListener('click', function() {
+            if (videoPlayer.paused) {
+                videoPlayer.play();
+                playPauseButton.innerHTML = '⏸️';
+            } else {
+                videoPlayer.pause();
+                playPauseButton.innerHTML = '▶️';
+            }
+        });
+
+        videoPlayer.addEventListener('timeupdate', function() {
+            const value = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+            seekBar.value = value;
+            timeDisplay.textContent = `${formatTime(videoPlayer.currentTime)} / ${formatTime(videoPlayer.duration)}`;
+        });
+
+        seekBar.addEventListener('input', function() {
+            const time = (seekBar.value / 100) * videoPlayer.duration;
+            videoPlayer.currentTime = time;
+        });
+
+        videoPlayer.addEventListener('ended', function() {
+            playPauseButton.innerHTML = '▶️';
+        });
+
+        // Добавляем hover эффект для видео
+        videoPlayer.addEventListener('mouseover', function() {
+            this.style.transform = 'scale(1.01)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+
+        videoPlayer.addEventListener('mouseout', function() {
+            this.style.transform = 'scale(1)';
+        });
+    </script>
+</body>
 </html>
