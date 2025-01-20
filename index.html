@@ -1,12 +1,208 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
- <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>shwouble</title>
- </head>
- <body>
-  <h1>Мне нечего тут сделать, так что наслаждайся этим мега эдитом.</h1>
-  <!-- Комментарий -->
-  <video width="640" height="480" controls src="https://i.imgur.com/4nIdqi8.mp4"></video>
- </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shwouble Player</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comfortaa', cursive;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #0a0a0a, #1a1a1a, #2a2a2a);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 0 0 20px 20px;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .player-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            width: 90%;
+            max-width: 800px;
+            margin: 20px;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .controls {
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+        }
+
+        .play-button {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255,107,107,0.4);
+        }
+
+        .seek-bar {
+            flex-grow: 1;
+            height: 5px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .seek-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .seek-bar::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .time-display {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.8);
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 2rem;
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1em;
+            line-height: 1.6;
+            padding: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        @keyframes gradient {
+            0% {background-position: 0% 50%}
+            50% {background-position: 100% 50%}
+            100% {background-position: 0% 50%}
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Shwouble</h1>
+    </div>
+
+    <div class="player-container">
+        <video id="videoPlayer" src="video.mp4"></video>
+        <div class="controls">
+            <button class="play-button" id="playPauseButton">▶</button>
+            <input type="range" class="seek-bar" id="seekBar" value="0">
+            <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+        </div>
+        <div class="message">
+            Мне нечего тут сделать, так что наслаждайся этим мега эдитом.
+        </div>
+    </div>
+
+    <script>
+        const videoPlayer = document.getElementById('videoPlayer');
+        const playPauseButton = document.getElementById('playPauseButton');
+        const seekBar = document.getElementById('seekBar');
+        const timeDisplay = document.getElementById('timeDisplay');
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            seconds = Math.floor(seconds % 60);
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        playPauseButton.addEventListener('click', function() {
+            if (videoPlayer.paused) {
+                videoPlayer.play();
+                playPauseButton.innerHTML = '⏸';
+            } else {
+                videoPlayer.pause();
+                playPauseButton.innerHTML = '▶';
+            }
+        });
+
+        videoPlayer.addEventListener('timeupdate', function() {
+            const value = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+            seekBar.value = value;
+            timeDisplay.textContent = `${formatTime(videoPlayer.currentTime)} / ${formatTime(videoPlayer.duration)}`;
+        });
+
+        seekBar.addEventListener('input', function() {
+            const time = (seekBar.value / 100) * videoPlayer.duration;
+            videoPlayer.currentTime = time;
+        });
+
+        videoPlayer.addEventListener('ended', function() {
+            playPauseButton.innerHTML = '▶';
+        });
+
+        // Добавляем hover эффект для видео
+        videoPlayer.addEventListener('mouseover', function() {
+            this.style.transform = 'scale(1.01)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+
+        videoPlayer.addEventListener('mouseout', function() {
+            this.style.transform = 'scale(1)';
+        });
+    </script>
+</body>
 </html>
